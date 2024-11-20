@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')
+
 // REGISTER
 
 router.post('/register', async(req,res)=>{
@@ -21,17 +22,20 @@ router.post('/register', async(req,res)=>{
         res.status(500).json({ message: "Internal Server Error", error: err.message })
     }
 })
+
 // LOGIN
+
 router.post('/login',async(req,res)=>{
-    const {username,password} = req.body
+    const {username} = req.body
     try{
         const user = await User.findOne({username : username});
         !user && res.status(400).json("Wrong Credentials!!")
 
-        const validated = await bcrypt.compare(password, user.password);
+        const validated = await bcrypt.compare(req.body.password, user.password);
         !validated && res.status(400).json("Wrong Credentials!!")
-
-        res.status(200).json(user)
+        
+        const {password, ...others} = user._doc
+        res.status(200).json(others)
 
     }catch(err){
         console.error("Error :", err);
