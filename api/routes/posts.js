@@ -91,7 +91,45 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// GET POST
 
+router.get('/:id', async(req,res)=>{
+    try{
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+        res.status(404).json("Post unavailable!")
+        }
+        res.status(200).json(post)
+    }catch(err){
+        console.error("Error:", err)
+        res.status(500).json(err)
+    }
+})
+
+// GET ALL POST
+
+router.get('/',async(req,res)=>{
+    const username = req.query.user
+    const catName = req.query.cat
+    try{
+        let post;
+        if(username){
+            post = await Post.find({username})
+        }else if(catName){
+            psot = await Post.find({
+                categories:{
+                    $in: [catname]
+                },  
+            })
+        }else {
+            post =await Post.find()
+        }
+       res.status(200).json(post)
+        
+    }catch(err){
+        res.status(500).json(err)
+    }
+})
 
 
 module.exports = router
